@@ -182,7 +182,11 @@ def serve(ip,port,sockobj, thiscommhandle,listencommhandle):
 	 					string = str(characterString)
 	 					replaceWith = str(mycontext['characterMap'][characterString])
 	 					comment = comment.replace(string,replaceWith)
-				
+	 			for characterString in mycontext['specialCharacters']:
+	 				if characterString in name:
+	 					string = str(characterString)
+	 					replaceWith = str(mycontext['characterMap'][characterString])
+	 					name = comment.replace(string,replaceWith)
 				#send header			
 				transmitOk(sockobj)
 				#create new entry in html for comment
