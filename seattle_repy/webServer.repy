@@ -100,7 +100,6 @@ def serve(ip,port,sockobj, thiscommhandle,listencommhandle):
 	if filename == 'thewall.html':
 		try:
 			transmitOk(sockobj)
-			print "OK!"
 			headerHTML = open('header_thewall.html','r')
 			formHTML = open('form.html', 'r')
 			footerHTML = open('footer.html','r')
@@ -120,9 +119,10 @@ def serve(ip,port,sockobj, thiscommhandle,listencommhandle):
 			footerHTML = open('footer.html','r')
 			fields = (filename[13:len(filename)].split('&'))
 			name = comment = (fields[0][5:len(fields[0])]).replace('+',' ')
-			comment = (fields[1][8:len(fields[1])]).replace('+',' ').replace('%21','!').replace('%27','\'').replace('%3F','?')
+			priority = (fields[1][9:len(fields[1])])
+			comment = (fields[2][8:len(fields[2])]).replace('+',' ').replace('%21','!').replace('%27','\'').replace('%3F','?')
 			transmitOk(sockobj)
-			commentHTML.write('<div class="bs-callout bs-callout-info"><h4>'+name+'</h4><p>'+comment+'</p></div>\n')
+			commentHTML.write('<div class="bs-callout '+priority+'"><h4>'+name+'</h4><p>'+comment+'</p></div>\n')
 			commentHTML.close()
 			readTransmit(headerHTML,sockobj)
 			readTransmit(formHTML, sockobj)
