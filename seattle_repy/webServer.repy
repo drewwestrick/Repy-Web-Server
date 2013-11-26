@@ -40,6 +40,7 @@ def listdirectory(sockobj):
 		tab6 = '\t\t\t\t\t\t'
 		i = 0
 		list = ''
+		#format listing with html
 		for file in directory:
 			i = i+1
 			list += tab5+'<tr>\n'+tab6+'<td>'+str(i)+'</td><td>'
@@ -47,6 +48,8 @@ def listdirectory(sockobj):
 			list += file
 			list += '</a>'
 			list += '</td>\n'+tab5+'</tr>\n'
+			#send packet for each file to ensure listing is
+		 	#not truncated due to packet size limit
 			sockobj.send(list)
 			list = ''
 	except:
@@ -57,6 +60,8 @@ def createHTTPHeader(statusCode, statusMsg):
 	returnHeader += '\n\n'
 	return returnHeader
 
+#used to check for any invalid filename characters which would
+#cause a bad request error
 def isValidFilename(filename):
 	invalidCharacters = ['`','~','!','@','#','$','%','^','*','(',
 		')','+','|','\\',']','[','{','}','\'','"',';',':','>',
@@ -67,6 +72,7 @@ def isValidFilename(filename):
 		
 	return True
 
+#use readline to keep packets small
 def readTransmit(fileobj,sockobj):
 	try:
 		payload = ' '
@@ -78,16 +84,56 @@ def readTransmit(fileobj,sockobj):
 	except:
 		print "Transmission Error"
 
-def getFileType(filename):
-	fileType = filename.split('.')[1]
-	return fileType
 def closeConnection(commhandle):
 	stopcomm(commhandle)
+	
+#used to map special characters for comments to The Wall
+def initializeCharMap():
+	characterMap = {'%2C':','}
+	characterMap['%3E'] = '>'
+	characterMap['%3C'] = '<'
+	characterMap['%2F'] = '/'
+	characterMap['%3F'] = '?'
+	characterMap['%3B'] = ';'
+	characterMap['%3A'] = ':'
+	characterMap['%27'] = '\''
+	characterMap['%22'] = '"'
+	characterMap['%5B'] = '['
+	characterMap['%5D'] = ']'
+	characterMap['%7B'] = '{'
+	characterMap['%7D'] = '}'
+	characterMap['%5C'] = '\\'
+	characterMap['%7C'] = '|'
+	characterMap['%60'] = '`'
+	characterMap['%7E'] = '~'
+	characterMap['%21'] = '!'
+	characterMap['%40'] = '@'
+	characterMap['%23'] = '#'
+	characterMap['%24'] = '$'
+	characterMap['%25'] = '%'
+	characterMap['%5E'] = '^'
+	characterMap['%26'] = '&'
+	characterMap['%28'] = '('
+	characterMap['%29'] = ')'
+	characterMap['%3D'] = '='
+	characterMap['%2B'] = ' '
+					
+	return characterMap
+	
+#array used to check if special character has been sent
+def initSpecialCharacterStrings():
+	specialCharacters = ['%60','%7E','%21','%40','%23','%24','%25','%5E','%28','%26',
+		'%29','%2B','%3D','%7C','%5C','%5D','%5B','%7B','%7D','%27','%22','%3B','%3A','%3E',
+		'%3C','%2C','%2F','%3F']
+		
+	return specialCharacters
+	
 def serve(ip,port,sockobj, thiscommhandle,listencommhandle):
 	#setup 5 second timer to receive valid header
 	eventhandle = settimer(5, closeConnection, (thiscommhandle,))
 	try:
 		httpheader = sockobj.recv(512) # Receive HTTP header
+		#process header and check for blank line at end
 		headerSplit = httpheader.split('\n')
 		if headerSplit[-1] == '':
 			canceltimer(eventhandle)
@@ -95,11 +141,12 @@ def serve(ip,port,sockobj, thiscommhandle,listencommhandle):
 		filename = lineZeroFields[1].split('/')[1]
 	except:
 		print "Error in HTTP header"
-		closeConnection()
-	#favicon check only needed in chrome
+		closeConnection(thiscommhandle)
+	#check if accessing the wall
 	if filename == 'thewall.html':
 		try:
 			transmitOk(sockobj)
+			#read existing comments and send html
 			headerHTML = open('header_thewall.html','r')
 			formHTML = open('form.html', 'r')
 			footerHTML = open('footer.html','r')
@@ -111,25 +158,42 @@ def serve(ip,port,sockobj, thiscommhandle,listencommhandle):
 			footerHTML.close()
 		except:
 			print "The Wall Error"
+	#check if sending arguments for the wall
 	elif (filename[0:13]=='thewall.html?'):
 		try:
+			#get html files
 			headerHTML = open('header_thewall.html','r')
 			formHTML = open('form.html', 'r')
 			commentHTML = open('comment.html','a')
 			footerHTML = open('footer.html','r')
+			#process arguments
 			fields = (filename[13:len(filename)].split('&'))
 			name = comment = (fields[0][5:len(fields[0])]).replace('+',' ')
-			priority = (fields[1][9:len(fields[1])])
+			priority = (fields[1][9:len(fields[1])])					
 			comment = (fields[2][8:len(fields[2])]).replace('+',' ').replace('%21','!').replace('%27','\'').replace('%3F','?')
-			transmitOk(sockobj)
-			commentHTML.write('<div class="bs-callout '+priority+'"><h4>'+name+'</h4><p>'+comment+'</p></div>\n')
-			commentHTML.close()
-			readTransmit(headerHTML,sockobj)
-			readTransmit(formHTML, sockobj)
-			readTransmit(footerHTML,sockobj)
-			headerHTML.close()
-			formHTML.close()
-			footerHTML.close()
+			if (name=='')or(comment==''):
+				readTransmit(headerHTML,sockobj)
+				transmit400Msg(sockobj)
+				readTransmit(footerHTML,sockobj)
+			else:
+				#map special characters
+	 			for characterString in mycontext['specialCharacters']:
+	 				if characterString in comment:
+	 					string = str(characterString)
+	 					replaceWith = str(mycontext['characterMap'][characterString])
+	 					comment = comment.replace(string,replaceWith)
+				
+				#send header			
+				transmitOk(sockobj)
+				#create new entry in html for comment
+				commentHTML.write('<div class="bs-callout '+priority+'"><h4>'+name+'</h4><p>'+comment+'</p></div>\n')
+				commentHTML.close()
+				readTransmit(headerHTML,sockobj)
+				readTransmit(formHTML, sockobj)
+				readTransmit(footerHTML,sockobj)
+				headerHTML.close()
+				formHTML.close()
+				footerHTML.close()
 		except:
 			print "The Wall Posting Error"
 	elif filename != 'favicon.ico':
@@ -177,6 +241,9 @@ def serve(ip,port,sockobj, thiscommhandle,listencommhandle):
 				readTransmit(footerHTML,sockobj)
 	stopcomm(thiscommhandle)   # close connection with this user
 if callfunc == 'initialize':  
+	mycontext['characterMap'] = initializeCharMap()
+	mycontext['specialCharacters'] = initSpecialCharacterStrings()
+	
 	if len(callargs) > 1:
 		raise Exception("Too many call arguments")
 	elif len(callargs) == 1:
@@ -186,5 +253,3 @@ if callfunc == 'initialize':
 		port = 12345
 		ip = '127.0.0.1'
 	listencommhandle = waitforconn(ip,port,serve) 
-
-  
