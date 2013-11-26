@@ -1,0 +1,12 @@
+1385415929.28:PID-10375:[fresh_software_updater] Fresh software updater started.
+1385417610.99:PID-10375:[do_rsync] Updating files: ['metainfo']
+1385417610.99:PID-10375:[restart_client] Stopping the nodemanager.
+1385417610.99:PID-10375:[restart_client] Starting the nodemanager.
+1385418664.82:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']
+1385420438.52:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']
+1385420801.36:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']
+1385422364.84:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']
+1385424948.15:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']
+1385426241.54:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']
+1385431418.79:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']
+1385432112.28:PID-10375:[do_rsync] The metainfo indicates no update is needed: ['Timestamps match']

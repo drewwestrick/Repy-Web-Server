@@ -1,0 +1,8 @@
+1385415925.1:PID-10329:New installation, beginning benchmark.
+Total resources measured by the script for Darwin OS: {'diskused': 65309065216, 'fileread': 306928, 'filewrite': 306928, 'loopsend': None, 'lograte': None, 'netrecv': None, 'random': 333637, 'insockets': 256, 'filesopened': 256, 'looprecv': None, 'cpu': 4, 'memory': 2147483648, 'netsend': None, 'outsockets': 256, 'events': None}
+Final checked resources that we will use: {'diskused': 65309065216, 'fileread': 306928, 'filewrite': 306928, 'loopsend': 50000000, 'lograte': 1500000, 'netrecv': 500000, 'random': 333637, 'insockets': 256, 'filesopened': 256, 'looprecv': 50000000, 'cpu': 4, 'memory': 2147483648, 'netsend': 500000, 'outsockets': 256, 'events': 500}
+User intended to donate :10 percent.
+Donated resources:{'diskused': 6530906521, 'fileread': 30692, 'loopsend': 5000000, 'lograte': 150000, 'netrecv': 50000, 'random': 33363, 'insockets': 25, 'filewrite': 30692, 'looprecv': 5000000, 'filesopened': 25, 'memory': 214748364, 'netsend': 50000, 'events': 500, 'outsockets': 25, 'cpu': 0.4}
+Useful amount of the donatedresources (offcut costs removed already): {'diskused': 653070652, 'fileread': 2869, 'loopsend': 500000, 'lograte': 14980, 'netrecv': 5000, 'random': 3336, 'insockets': 2, 'filewrite': 2869, 'looprecv': 500000, 'filesopened': 2, 'memory': 21274836, 'netsend': 5000, 'cpu': 0.0396, 'outsockets': 2, 'events': 49}
+
+1385415928.95:PID-10329: seattle completed installation on: 11-25-2013 16:45:28

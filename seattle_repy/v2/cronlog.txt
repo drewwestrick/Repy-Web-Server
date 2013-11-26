@@ -1,0 +1,3 @@
+seattle must first be installed before the start_seattle.sh script can be run.  To install, run the install.sh script.
+seattle was not properly started.
+If you continue to see this error, please contact the seattle development team.
